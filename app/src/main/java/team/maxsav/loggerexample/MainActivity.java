@@ -17,15 +17,20 @@ public class MainActivity extends AppCompatActivity {
 		setContentView( R.layout.activity_main );
 
 		try {
-			Logger.initialize( this, Logger.DEFAULT_PUBLIC_KEY, false );
+			Logger.initialize( this, null, false );
 		} catch (IOException e) {
 			e.printStackTrace();
 			Toast.makeText( this, e.toString(), Toast.LENGTH_SHORT ).show();
 		}
-		long millis = System.currentTimeMillis();
-		for(int i = 0; i <= 10; i++){
-			Logger.i( "TEST", "Message " + i );
-		}
-		Toast.makeText( this, "" + (System.currentTimeMillis() - millis), Toast.LENGTH_SHORT ).show();
+		new Thread(()->{
+			for(int i = 1; i <= 10; i++){
+				Logger.i( "Logger Example", "This is message number " + i + " from first thread" );
+			}
+		}).start();
+		new Thread(()->{
+			for(int i = 1; i <= 10; i++){
+				Logger.i( "Logger Example", "This is message number " + i + " from second thread" );
+			}
+		}).start();
 	}
 }
