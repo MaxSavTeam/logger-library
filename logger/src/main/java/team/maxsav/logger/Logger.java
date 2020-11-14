@@ -130,7 +130,7 @@ public class Logger {
 		getInstance().addRecord( "I", tag, message );
 	}
 
-	public static void e(String tag, String message){info(tag, message );}
+	public static void e(String tag, String message){error(tag, message );}
 	public static void error(String tag, String message) {
 		if ( isDebug ) {
 			Log.e( tag, message );
@@ -139,7 +139,7 @@ public class Logger {
 		getInstance().addRecord( "E", tag, message );
 	}
 
-	public static void v(String tag, String message){info(tag, message );}
+	public static void v(String tag, String message){verbose(tag, message );}
 	public static void verbose(String tag, String message) {
 		if ( isDebug ) {
 			Log.v( tag, message );
@@ -148,7 +148,7 @@ public class Logger {
 		getInstance().addRecord( "V", tag, message );
 	}
 
-	public static void d(String tag, String message){info(tag, message );}
+	public static void d(String tag, String message){debug(tag, message );}
 	public static void debug(String tag, String message) {
 		if ( isDebug ) {
 			Log.d( tag, message );
@@ -157,7 +157,7 @@ public class Logger {
 		getInstance().addRecord( "D", tag, message );
 	}
 
-	public static void w(String tag, String message){info(tag, message );}
+	public static void w(String tag, String message){warn(tag, message );}
 	public static void warn(String tag, String message) {
 		if ( isDebug ) {
 			Log.w( tag, message );
