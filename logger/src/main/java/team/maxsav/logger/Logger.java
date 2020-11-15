@@ -5,6 +5,8 @@ import android.os.Process;
 import android.util.Base64;
 import android.util.Log;
 
+import androidx.annotation.CallSuper;
+
 import java.io.IOException;
 import java.security.KeyFactory;
 import java.security.PublicKey;
@@ -53,11 +55,10 @@ public class Logger {
 	 *                     and private ({@link Logger#DEFAULT_PRIVATE_KEY}) keys
 	 * @param debug If {@code true} logs also will be written in system log
 	 * */
-	public synchronized static void initialize(Context context, String rsaPublicKey, boolean debug) throws IOException {
+	public static void initialize(Context context, String rsaPublicKey, boolean debug) throws IOException {
 		isDebug = debug;
 		if ( rsaPublicKey != null ) {
 			if ( verifyKey( rsaPublicKey ) ) {
-				Log.i( "Logger", "initialize: key verified" );
 				mRsaPublicKey = rsaPublicKey;
 			} else {
 				throw new IllegalArgumentException( "invalid rsa key" );

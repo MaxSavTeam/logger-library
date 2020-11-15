@@ -33,7 +33,7 @@ class Writer {
 		}
 	});
 
-	private String path;
+	private final String path;
 
 	Writer(Context context, String rsaPublicKey) throws IOException {
 		this.rsaPublicKey = rsaPublicKey;
