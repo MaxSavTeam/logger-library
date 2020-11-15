@@ -54,6 +54,7 @@ public class Logger {
 	 *                     You can use default public ({@link Logger#DEFAULT_PUBLIC_KEY})
 	 *                     and private ({@link Logger#DEFAULT_PRIVATE_KEY}) keys
 	 * @param debug If {@code true} logs also will be written in system log
+	 * @throws IOException This exception will be thrown if writer couldn't create file for current session
 	 * */
 	public static void initialize(Context context, String rsaPublicKey, boolean debug) throws IOException {
 		isDebug = debug;
