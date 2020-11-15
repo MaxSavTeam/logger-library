@@ -1,6 +1,8 @@
 package team.maxsav.logger;
 
 import android.content.Context;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.os.Build;
 import android.util.Base64;
 import android.util.Log;
@@ -54,7 +56,14 @@ class Writer {
 		mQueue.add( "Model: " + Build.MODEL );
 		mQueue.add( "Hardware: " + Build.HARDWARE );
 		mQueue.add( "Android SDK version: " + Build.VERSION.SDK_INT );
-		mQueue.add( "Package: " + context.getPackageName() );
+		mQueue.add( "Application package: " + context.getPackageName() );
+		try {
+			PackageInfo pInfo = context.getPackageManager().getPackageInfo( context.getPackageName(), 0 );
+			mQueue.add( "Version: " + pInfo.versionName );
+			mQueue.add( "Version code: " + pInfo.versionCode );
+		} catch (PackageManager.NameNotFoundException e) {
+			e.printStackTrace();
+		}
 		mQueue.add( "" );
 		mThread.start();
 	}
