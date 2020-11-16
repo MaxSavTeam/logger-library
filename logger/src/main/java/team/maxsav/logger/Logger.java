@@ -133,6 +133,7 @@ public class Logger {
 	}
 
 	public static void e(String tag, String message){error(tag, message );}
+	public static void e(String tag, String message, Throwable tr){error(tag, message + "\n" + Log.getStackTraceString( tr ) );}
 	public static void error(String tag, String message) {
 		if ( isDebug ) {
 			Log.e( tag, message );
