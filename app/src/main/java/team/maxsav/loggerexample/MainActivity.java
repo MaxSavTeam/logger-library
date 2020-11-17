@@ -17,19 +17,27 @@ public class MainActivity extends AppCompatActivity {
 		setContentView( R.layout.activity_main );
 
 		try {
-			Logger.initialize( this, null, false );
+			Logger.initialize( this, Logger.DEFAULT_PUBLIC_KEY, false );
 		} catch (IOException e) {
 			e.printStackTrace();
 			Toast.makeText( this, e.toString(), Toast.LENGTH_SHORT ).show();
 		}
 		new Thread(()->{
 			for(int i = 1; i <= 10; i++){
-				Logger.i( "Logger Example", "This is message number " + i + " from first thread" );
+				if(i == 6){
+					Logger.e( "Logger Example", "Error simulation", new Exception("Test exception") );
+				}else {
+					Logger.i( "Logger Example", "This is message number " + i + " from first thread" );
+				}
 			}
 		}).start();
 		new Thread(()->{
 			for(int i = 1; i <= 10; i++){
-				Logger.i( "Logger Example", "This is message number " + i + " from second thread" );
+				if(i == 5){
+					Logger.i( "Logger Example", "Very long message jbdfusgvoszvgidzblvkhjbzkdhvbkhjzdbzhbdkhbvluihoeirughUIEHgoizufhrfdbvfdbv zkjhfbvkzjhbd khjbzkdhjb khjbgkurbfgogefoGEFHgoudvglhBSLDVHJbhjvboargviuhrpiuvbhpizvfuhdrpziufhhdlivbzvzhjfdbkljhzborefgbdvlzhifdgvjhzfd" );
+				}else {
+					Logger.i( "Logger Example", "This is message number " + i + " from second thread" );
+				}
 			}
 		}).start();
 	}

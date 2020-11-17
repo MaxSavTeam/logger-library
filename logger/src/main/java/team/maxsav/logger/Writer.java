@@ -4,28 +4,23 @@ import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Build;
-import android.util.Base64;
-import android.util.Log;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.security.Key;
-import java.security.KeyFactory;
-import java.security.spec.X509EncodedKeySpec;
+import java.security.GeneralSecurityException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import javax.crypto.Cipher;
-
 class Writer {
 	private final FileWriter mFileWriter;
 	private final Queue<String> mQueue = new ConcurrentLinkedQueue<>();
 	private boolean isWriting = false;
 	private final String rsaPublicKey;
+	private Encryptor mEncryptor;
 
 	private final Thread mThread = new Thread(()->{
 		while ( !Thread.currentThread().isInterrupted() ) {
@@ -39,6 +34,8 @@ class Writer {
 
 	Writer(Context context, String rsaPublicKey) throws IOException {
 		this.rsaPublicKey = rsaPublicKey;
+		if(rsaPublicKey != null)
+			mEncryptor = new Encryptor( rsaPublicKey );
 
 		String time = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss").format( new Date() );
 		String externalFilesDir = context.getApplicationContext().getExternalFilesDir( null ).getPath();
@@ -109,18 +106,9 @@ class Writer {
 			return text;
 		}
 
-		X509EncodedKeySpec spec = new X509EncodedKeySpec( Base64.decode( rsaPublicKey, Base64.DEFAULT ) );
 		try {
-			Key publicKey = KeyFactory.getInstance( "RSA" ).generatePublic( spec );
-			Cipher cipher = Cipher.getInstance( "RSA" );
-			cipher.init( Cipher.ENCRYPT_MODE, publicKey );
-			byte[] bytes = cipher.doFinal( text.getBytes() );
-			StringBuilder sb = new StringBuilder();
-			for (byte b : bytes) {
-				sb.append( String.format( "%02x", b ) );
-			}
-			return sb.toString();
-		} catch (Exception e) {
+			return mEncryptor.encrypt( text );
+		} catch (GeneralSecurityException e) {
 			e.printStackTrace();
 			return text;
 		}
