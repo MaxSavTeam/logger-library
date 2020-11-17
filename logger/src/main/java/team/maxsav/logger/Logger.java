@@ -117,6 +117,16 @@ public class Logger {
 	}
 
 	/**
+	 * Returns list of messages in log, which may be encrypted.
+	 * Use {@link LogDecryptor#decryptLogFile(String)} or {@link Logger#getDecryptedLog(String)} to get decrypted log messages
+	 *
+	 * @throws IOException if there is some error during log reading
+	 * */
+	public ArrayList<String> readLogFile(String pathToLog) throws IOException {
+		return LogDecryptor.readFileLinesWithoutPartSeparator( pathToLog );
+	}
+
+	/**
 	 * Call this function when your app is destroying.
 	 * After function call, all messages in buffer will be added to writer and will be written into log
 	 * */
@@ -191,6 +201,20 @@ public class Logger {
 		}
 		checkIfInitialized();
 		getInstance().addRecord( "W", tag, message );
+	}
+
+	/**
+	 * Flushes all messages in buffer to writer
+	 * */
+	public static void flush(){
+		getInstance().flushBuffer();
+	}
+
+	private void flushBuffer(){
+		synchronized (mBuffer){
+			mWriter.addAll( mBuffer );
+			mBuffer.clear();
+		}
 	}
 
 	private void addRecord(String level, String tag, String message) {
