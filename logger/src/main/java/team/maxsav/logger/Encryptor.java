@@ -1,6 +1,7 @@
 package team.maxsav.logger;
 
 import android.util.Base64;
+import android.util.Log;
 
 import java.security.GeneralSecurityException;
 import java.security.Key;
@@ -55,6 +56,9 @@ class Encryptor {
 				if(i != parts.size() - 1)
 					resultString.append( " " );
 			}
+			LogDecryptor logDecryptor = new LogDecryptor(Logger.DEFAULT_PRIVATE_KEY);
+			String result = resultString.toString();
+			Log.i( "Logger Encryptor", "encrypt: test passed = " + text.equals( logDecryptor.decrypt( result ) )  );
 			return resultString.toString();
 		}
 	}

@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Build;
+import android.util.Log;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -31,6 +32,9 @@ class Writer {
 	});
 
 	private final String path;
+
+	public static final String partsSeparatorString = "================";
+	public int additionalInfoLinesCount;
 
 	Writer(Context context, String rsaPublicKey) throws IOException {
 		this.rsaPublicKey = rsaPublicKey;
@@ -61,21 +65,26 @@ class Writer {
 		} catch (PackageManager.NameNotFoundException e) {
 			e.printStackTrace();
 		}
-		mQueue.add( "" );
+		additionalInfoLinesCount = mQueue.size();
+		mQueue.add( partsSeparatorString );
 		mThread.start();
 	}
 
-	public String getPath() {
+	String getPath() {
 		return path;
 	}
 
-	public void addAll(ArrayList<String> arrayList){
+	int getAdditionalInfoLinesCount() {
+		return additionalInfoLinesCount;
+	}
+
+	void addAll(ArrayList<String> arrayList){
 		mQueue.addAll( arrayList );
 	}
 
 	private boolean needToClose = false;
 
-	public void close(){
+	void close(){
 		mThread.interrupt();
 		needToClose = true;
 	}
@@ -102,7 +111,7 @@ class Writer {
 	}
 
 	private String encrypt(String text) {
-		if (rsaPublicKey  == null || text.equals( "" ) ) {
+		if (rsaPublicKey  == null || text.equals( partsSeparatorString ) ) {
 			return text;
 		}
 
@@ -110,6 +119,7 @@ class Writer {
 			return mEncryptor.encrypt( text );
 		} catch (GeneralSecurityException e) {
 			e.printStackTrace();
+			Log.i( "Logger Writer", "encrypt: " + e );
 			return text;
 		}
 	}

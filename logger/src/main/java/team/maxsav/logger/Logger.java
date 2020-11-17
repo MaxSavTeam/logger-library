@@ -8,6 +8,7 @@ import android.util.Log;
 import androidx.annotation.CallSuper;
 
 import java.io.IOException;
+import java.security.GeneralSecurityException;
 import java.security.KeyFactory;
 import java.security.PublicKey;
 import java.security.spec.X509EncodedKeySpec;
@@ -93,8 +94,31 @@ public class Logger {
 	}
 
 	/**
+	 * Returns lines count of information about device at the beginning of log
+	 * */
+	public static int getAdditionalInfoLinesCount(){
+		return getInstance().mWriter.getAdditionalInfoLinesCount();
+	}
+
+	/**
+	 * Returns list of decrypted messages.
+	 * If log is not encrypted, returns messages directly from log
+	 *
+	 * @param privateKey RSA private key, which log can be decrypted with
+	 *
+	 * @throws IOException if there is some error during log reading
+	 * @throws GeneralSecurityException if there is some error during log decryption
+	 * */
+	public static ArrayList<String> getDecryptedLog(String privateKey) throws IOException, GeneralSecurityException {
+		String path = getPathForLog();
+		if(mRsaPublicKey == null)
+			return LogDecryptor.readFileLinesWithoutPartSeparator( path );
+		return new LogDecryptor( privateKey ).decryptLogFile( path );
+	}
+
+	/**
 	 * Call this function when your app is destroying.
-	 * After function call, all messages in buffer will be added to writer and цшдд иу written into log
+	 * After function call, all messages in buffer will be added to writer and will be written into log
 	 * */
 	public static void closeLogger(){
 		getInstance().close();
