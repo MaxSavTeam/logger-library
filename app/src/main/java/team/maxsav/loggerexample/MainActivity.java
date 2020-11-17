@@ -3,9 +3,12 @@ package team.maxsav.loggerexample;
 import android.os.Bundle;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import java.io.IOException;
+import java.security.GeneralSecurityException;
+import java.util.ArrayList;
 
 import team.maxsav.logger.Logger;
 
@@ -40,5 +43,24 @@ public class MainActivity extends AppCompatActivity {
 				}
 			}
 		}).start();
+
+		findViewById( R.id.btnViewLog ).setOnClickListener( view->{
+			try {
+				ArrayList<String> messages = Logger.getDecryptedLog( Logger.DEFAULT_PRIVATE_KEY );
+				String message = "";
+				for(String s : messages){
+					message = String.format( "%s%s\n", message, s );
+				}
+
+				AlertDialog.Builder builder = new AlertDialog.Builder( this );
+				builder.setMessage( message )
+						.setPositiveButton( "OK", (dialog, i)->dialog.cancel() )
+						.setCancelable( false );
+				builder.show();
+			} catch (IOException | GeneralSecurityException e) {
+				Toast.makeText( this, e.toString(), Toast.LENGTH_LONG ).show();
+				e.printStackTrace();
+			}
+		} );
 	}
 }

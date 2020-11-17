@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Logger Example</string>
+
+    <string name="view_log">View log</string>
 </resources>
