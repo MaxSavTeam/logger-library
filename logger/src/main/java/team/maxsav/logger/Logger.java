@@ -18,7 +18,7 @@ import java.util.Date;
 
 /**
  * @author Max Savitsky
- * */
+ */
 public class Logger {
 
 	private static String mRsaPublicKey;
@@ -32,13 +32,13 @@ public class Logger {
 	 * RSA public key.
 	 * You can use it to protect log from users, but it can be decrypted by anyone who saw this file,
 	 * because of {@link Logger#DEFAULT_PRIVATE_KEY} in this file
-	 * */
+	 */
 	public static final String DEFAULT_PUBLIC_KEY = "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQosywLGiHrN1ZtNK5dz37W7/ty/nI43XEAh6uOKp6Vw7Gy8n4Tqxm4e8lS1uyxpH03BSr9yHDPz4qMOERVMdBLL0GjxL5jDKS4FGLCw3AYSP5B34ImlFhbJo/EPrrCid1vtFHIy0vPBsOvuSSiMLjPejLekj7yhoRMSD+eNEvEUgQIDAQAB";
 
 	/**
 	 * RSA private key.
 	 * You can use it to decrypt log, which was encrypted with {@link Logger#DEFAULT_PUBLIC_KEY}
-	 * */
+	 */
 	public static final String DEFAULT_PRIVATE_KEY = "MIICeQIBADANBgkqhkiG9w0BAQEFAASCAmMwggJfAgEAAoGBCizLAsaIes3Vm00rl3Pftbv+3L+cjjdcQCHq44qnpXDsbLyfhOrGbh7yVLW7LGkfTcFKv3IcM/Piow4RFUx0EsvQaPEvmMMpLgUYsLDcBhI/kHfgiaUWFsmj8Q+usKJ3W+0UcjLS88Gw6+5JKIwuM96Mt6SPvKGhExIP540S8RSBAgMBAAECgYEHjUFLmRB4nMa6UidVbEIQfyxkqK5Ie1wzmTjdku5kgxBmkASRQTLvTnarWopGJut96UVSHB5EjPGb9XfGaA0KVYhUJlN9GiN8cB4xniLt6koORihEtdZ0kAquvWWqPAFZqRsQEAqivcvcHzRFal6oxf2NPYTrZeRcftYKY3j+j0UCQQOYLnMJaqmjpsftqRXVjGOeeuEYGQhb05p7VyBKtcfFf71zPsWwWg9Z3bP0VcX03QVcxB8nEzYDUpMMJGMdUF+HAkEC1KtGx0uqCV1Y3pR9i0hoh+R1Ef3gjpEFqH1C+I1uk//TNOxb2lcAQZ/3dPuJ3JZ4UFwiZ57CKGZRaa4dQKGdtwJBAoUOGsqBIUZ9xi2OmKXI8pTIYz83XSqyHdtU6mg1IkQLFk3RtVe46oX+6wXfkxPiVL4BJi2IRBb0Le0XHPwRucUCQQCoXv878PWZ5WlvlbqxsOowoMEepAkXttREuI3l6B6IHol5I22YBlzV4pABSyxV51Qe/7kysC1Wa6eA0WaUjLhzAkEBa3mBT41uiNlLfEo39Pf6nGNifbKnzZdqs9qz58MjQ4xepKwPQ1Fkz2isEyODobGrLFka6BhNaH/xRp1N2eDPyg==";
 
 	private static Logger instance;
@@ -50,23 +50,20 @@ public class Logger {
 	/**
 	 * Initializes logger. Should be called before usage
 	 *
-	 * @param context application context
+	 * @param context      application context
 	 * @param rsaPublicKey RSA public key to encrypt logs. If yo do not want this, pass {@code null}.
 	 *                     You can use default public ({@link Logger#DEFAULT_PUBLIC_KEY})
 	 *                     and private ({@link Logger#DEFAULT_PRIVATE_KEY}) keys
-	 * @param debug If {@code true} logs also will be written in system log
+	 * @param debug        If {@code true} logs also will be written in system log
 	 * @throws IOException This exception will be thrown if writer couldn't create file for current session
-	 * */
+	 */
 	public static void initialize(Context context, String rsaPublicKey, boolean debug) throws IOException {
 		isDebug = debug;
 		if ( rsaPublicKey != null ) {
 			if ( verifyKey( rsaPublicKey ) ) {
 				mRsaPublicKey = rsaPublicKey;
-			} else {
-				throw new IllegalArgumentException( "invalid rsa key" );
 			}
 		}
-		mRsaPublicKey = rsaPublicKey;
 		initialized = true;
 		instance = new Logger( context );
 	}
@@ -88,15 +85,15 @@ public class Logger {
 
 	/**
 	 * Function returns path for current log file
-	 * */
-	public static String getPathForLog(){
+	 */
+	public static String getPathForLog() {
 		return getInstance().mWriter.getPath();
 	}
 
 	/**
 	 * Returns lines count of information about device at the beginning of log
-	 * */
-	public static int getAdditionalInfoLinesCount(){
+	 */
+	public static int getAdditionalInfoLinesCount() {
 		return getInstance().mWriter.getAdditionalInfoLinesCount();
 	}
 
@@ -105,14 +102,14 @@ public class Logger {
 	 * If log is not encrypted, returns messages directly from log
 	 *
 	 * @param privateKey RSA private key, which log can be decrypted with
-	 *
-	 * @throws IOException if there is some error during log reading
+	 * @throws IOException              if there is some error during log reading
 	 * @throws GeneralSecurityException if there is some error during log decryption
-	 * */
+	 */
 	public static ArrayList<String> getDecryptedLog(String privateKey) throws IOException, GeneralSecurityException {
 		String path = getPathForLog();
-		if(mRsaPublicKey == null)
+		if ( mRsaPublicKey == null ) {
 			return LogDecryptor.readFileLinesWithoutPartSeparator( path );
+		}
 		return new LogDecryptor( privateKey ).decryptLogFile( path );
 	}
 
@@ -121,7 +118,7 @@ public class Logger {
 	 * Use {@link LogDecryptor#decryptLogFile(String)} or {@link Logger#getDecryptedLog(String)} to get decrypted log messages
 	 *
 	 * @throws IOException if there is some error during log reading
-	 * */
+	 */
 	public ArrayList<String> readLogFile(String pathToLog) throws IOException {
 		return LogDecryptor.readFileLinesWithoutPartSeparator( pathToLog );
 	}
@@ -129,12 +126,12 @@ public class Logger {
 	/**
 	 * Call this function when your app is destroying.
 	 * After function call, all messages in buffer will be added to writer and will be written into log
-	 * */
-	public static void closeLogger(){
+	 */
+	public static void closeLogger() {
 		getInstance().close();
 	}
 
-	private void close(){
+	private void close() {
 		synchronized (mBuffer) {
 			mWriter.addAll( mBuffer );
 			mBuffer.clear();
@@ -145,73 +142,78 @@ public class Logger {
 
 	@Override
 	protected void finalize() throws Throwable {
-		if(initialized){
+		if ( initialized ) {
 			close();
 		}
 		super.finalize();
 	}
 
-	private static void checkIfInitialized() {
-		if ( !initialized ) {
-			throw new IllegalStateException( "Logger not initialized. Please call initialize function before use" );
-		}
-	}
+	public static void i(String tag, String message) {info( tag, message );}
 
-	public static void i(String tag, String message){info(tag, message );}
 	public static void info(String tag, String message) {
 		if ( isDebug ) {
 			Log.i( tag, message );
 		}
-		checkIfInitialized();
-		getInstance().addRecord( "I", tag, message );
+		if ( initialized ) {
+			getInstance().addRecord( "I", tag, message );
+		}
 	}
 
-	public static void e(String tag, String message){error(tag, message );}
-	public static void e(String tag, String message, Throwable tr){error(tag, message + "\n" + Log.getStackTraceString( tr ) );}
+	public static void e(String tag, String message) {error( tag, message );}
+
+	public static void e(String tag, String message, Throwable tr) {error( tag, message + "\n" + Log.getStackTraceString( tr ) );}
+
 	public static void error(String tag, String message) {
 		if ( isDebug ) {
 			Log.e( tag, message );
 		}
-		checkIfInitialized();
-		getInstance().addRecord( "E", tag, message );
+		if ( initialized ) {
+			getInstance().addRecord( "E", tag, message );
+		}
 	}
 
-	public static void v(String tag, String message){verbose(tag, message );}
+	public static void v(String tag, String message) {verbose( tag, message );}
+
 	public static void verbose(String tag, String message) {
 		if ( isDebug ) {
 			Log.v( tag, message );
 		}
-		checkIfInitialized();
-		getInstance().addRecord( "V", tag, message );
+		if ( initialized ) {
+			getInstance().addRecord( "V", tag, message );
+		}
 	}
 
-	public static void d(String tag, String message){debug(tag, message );}
+	public static void d(String tag, String message) {debug( tag, message );}
+
 	public static void debug(String tag, String message) {
 		if ( isDebug ) {
 			Log.d( tag, message );
 		}
-		checkIfInitialized();
-		getInstance().addRecord( "D", tag, message );
+		if ( initialized ) {
+			getInstance().addRecord( "D", tag, message );
+		}
 	}
 
-	public static void w(String tag, String message){warn(tag, message );}
+	public static void w(String tag, String message) {warn( tag, message );}
+
 	public static void warn(String tag, String message) {
 		if ( isDebug ) {
 			Log.w( tag, message );
 		}
-		checkIfInitialized();
-		getInstance().addRecord( "W", tag, message );
+		if ( initialized ) {
+			getInstance().addRecord( "W", tag, message );
+		}
 	}
 
 	/**
 	 * Flushes all messages in buffer to writer
-	 * */
-	public static void flush(){
+	 */
+	public static void flush() {
 		getInstance().flushBuffer();
 	}
 
-	private void flushBuffer(){
-		synchronized (mBuffer){
+	private void flushBuffer() {
+		synchronized (mBuffer) {
 			mWriter.addAll( mBuffer );
 			mBuffer.clear();
 		}
