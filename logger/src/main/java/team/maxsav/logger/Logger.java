@@ -5,8 +5,6 @@ import android.os.Process;
 import android.util.Base64;
 import android.util.Log;
 
-import androidx.annotation.CallSuper;
-
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.security.KeyFactory;
@@ -59,16 +57,16 @@ public class Logger {
 	 */
 	public static void initialize(Context context, String rsaPublicKey, boolean debug) throws IOException {
 		isDebug = debug;
-		if ( rsaPublicKey != null ) {
-			if ( verifyKey( rsaPublicKey ) ) {
-				mRsaPublicKey = rsaPublicKey;
-			}
+		if ( verifyKey( rsaPublicKey ) ) {
+			mRsaPublicKey = rsaPublicKey;
 		}
 		initialized = true;
 		instance = new Logger( context );
 	}
 
 	private static boolean verifyKey(String stringKey) {
+		if(stringKey == null)
+			return false;
 		X509EncodedKeySpec spec = new X509EncodedKeySpec( Base64.decode( stringKey, Base64.DEFAULT ) );
 		try {
 			PublicKey key = KeyFactory.getInstance( "RSA" ).generatePublic( spec );

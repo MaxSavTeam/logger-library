@@ -22,6 +22,7 @@ class Writer {
 	private boolean isWriting = false;
 	private final String rsaPublicKey;
 	private Encryptor mEncryptor;
+	private boolean needToClose = false;
 
 	private final Thread mThread = new Thread(()->{
 		while ( !Thread.currentThread().isInterrupted() ) {
@@ -81,8 +82,6 @@ class Writer {
 	void addAll(ArrayList<String> arrayList){
 		mQueue.addAll( arrayList );
 	}
-
-	private boolean needToClose = false;
 
 	void close(){
 		mThread.interrupt();
