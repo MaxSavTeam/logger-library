@@ -90,6 +90,7 @@ class Writer {
 
 	private void write(){
 		if(mQueue.size() > 0){
+			isWriting = true;
 			String element = mQueue.poll();
 			element = encrypt( element );
 			try {

@@ -13,6 +13,8 @@ import java.security.spec.X509EncodedKeySpec;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  * @author Max Savitsky
@@ -25,6 +27,7 @@ public class Logger {
 	private final ArrayList<String> mBuffer = new ArrayList<>();
 	private static final int BUFFER_SIZE = 10;
 	private final Writer mWriter;
+	private Timer mTimer;
 
 	/**
 	 * RSA public key.
@@ -56,12 +59,29 @@ public class Logger {
 	 * @throws IOException This exception will be thrown if writer couldn't create file for current session
 	 */
 	public static void initialize(Context context, String rsaPublicKey, boolean debug) throws IOException {
+		initialize( context, rsaPublicKey, debug, 30 );
+	}
+
+	/**
+	 * Initializes logger. Should be called before usage
+	 *
+	 * @param context      application context
+	 * @param rsaPublicKey RSA public key to encrypt logs. If yo do not want this, pass {@code null}.
+	 *                     You can use default public ({@link Logger#DEFAULT_PUBLIC_KEY})
+	 *                     and private ({@link Logger#DEFAULT_PRIVATE_KEY}) keys
+	 * @param debug        If {@code true} logs also will be written in system log
+	 * @param timerPeriod  Logger will start a timer with a period in seconds that will flush the entries in the buffer.
+	 *                     Pass {@code timerPeriod} <= 0 if you don't want autoflushing.
+	 *                     Default is 30.
+	 * @throws IOException This exception will be thrown if writer couldn't create file for current session
+	 */
+	public static void initialize(Context context, String rsaPublicKey, boolean debug, int timerPeriod) throws IOException{
 		isDebug = debug;
 		if ( verifyKey( rsaPublicKey ) ) {
 			mRsaPublicKey = rsaPublicKey;
 		}
 		initialized = true;
-		instance = new Logger( context );
+		instance = new Logger( context, timerPeriod );
 	}
 
 	private static boolean verifyKey(String stringKey) {
@@ -77,8 +97,17 @@ public class Logger {
 		}
 	}
 
-	private Logger(Context context) throws IOException {
+	private Logger(Context context, int timerPeriod) throws IOException {
 		mWriter = new Writer( context, mRsaPublicKey );
+		if(timerPeriod > 0){
+			mTimer = new Timer();
+			mTimer.schedule( new TimerTask() {
+				@Override
+				public void run() {
+					flush();
+				}
+			}, timerPeriod * 1000, timerPeriod * 1000 );
+		}
 	}
 
 	/**
@@ -134,6 +163,10 @@ public class Logger {
 			mWriter.addAll( mBuffer );
 			mBuffer.clear();
 			mWriter.close();
+		}
+		if(mTimer != null){
+			mTimer.cancel();
+			mTimer = null;
 		}
 		initialized = false;
 	}
