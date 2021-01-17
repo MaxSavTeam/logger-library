@@ -5,6 +5,8 @@ import android.os.Process;
 import android.util.Base64;
 import android.util.Log;
 
+import androidx.annotation.NonNull;
+
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.security.KeyFactory;
@@ -108,6 +110,15 @@ public class Logger {
 				}
 			}, timerPeriod * 1000, timerPeriod * 1000 );
 		}
+		final Thread.UncaughtExceptionHandler previousHandler = Thread.getDefaultUncaughtExceptionHandler();
+		Thread.setDefaultUncaughtExceptionHandler( new Thread.UncaughtExceptionHandler() {
+			@Override
+			public void uncaughtException(@NonNull Thread t, @NonNull Throwable e) {
+				flush();
+				if(previousHandler != null)
+					previousHandler.uncaughtException( t, e );
+			}
+		} );
 	}
 
 	/**
