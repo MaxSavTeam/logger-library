@@ -17,7 +17,7 @@ allprojects {
 Add library dependency to your module-level build.gradle
 ```
 dependencies {
-    implementation 'com.github.MaxSavTeam:logger-library:0.2.0'
+    implementation 'com.github.MaxSavTeam:logger-library:0.4.0'
 }
 ```
 
