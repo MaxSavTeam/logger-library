@@ -17,7 +17,7 @@ allprojects {
 Add library dependency to your module-level build.gradle
 ```
 dependencies {
-    implementation 'com.github.MaxSavTeam:logger-library:0.4.0'
+    implementation 'com.github.MaxSavTeam:logger-library:0.5.0'
 }
 ```
 
@@ -25,15 +25,28 @@ dependencies {
 ### Initilization
 Firstly, you need to initialize Logger
 ```
-Logger.initialize(Context context, String rsaPublicKey, boolean isDebug);
+Logger.initialize(Context context, String rsaPublicKey, boolean isDebug, int timerPeriod, boolean autoFlushOnException, boolean printErrorOnException);
 ```
-The first argument is application context. Context is used to get application external file  
+`Context context` is application context. Context is used to get application external file  
 
-The second argument is public key for RSA. All messages will be encrypted with this key.
+`String rsaPublicKey` is public key for RSA. All messages will be encrypted with this key.
 You can use library's public (``Logger.DEFAULT_PUBLIC_KEY``) and private (``Logger.DEFAULT_PRIVATE_KEY``) keys.
 Pass ``null`` to disable encryption.
 
-The third argument determines whether to write to the standard log.
+`boolean isDebug` determines whether to write to the standard log.
+
+`int timerPeriod` is timer period in seconds after which Logger will clear buffer each time.
+Pass <= 0 if tou don't wont autoflushing.
+Default is 30.
+
+`boolean autoFlushOnException`. If true, Logger will override Thread.defaultUncaughtExceptionHandler.
+Default is true.
+
+`boolean printErrorOnException`. If true, then when an exception occurs, the Logger will record it automatically with tag "Logger" and throw the exception further.
+Also overrides Thread.defaultUncaughtExceptionHandler.
+Default is true.
+
+**Note:** if `autoFlushOnException` = true or `printErrorOnException` = true, Logger will override exception handler. **This means that if you override handler yourself, Logger will not work.**
 
 After initialization will be created log file with information about device and application
 
