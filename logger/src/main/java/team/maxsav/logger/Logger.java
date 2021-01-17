@@ -115,7 +115,7 @@ public class Logger {
 		final Thread.UncaughtExceptionHandler previousHandler = Thread.getDefaultUncaughtExceptionHandler();
 		Thread.setDefaultUncaughtExceptionHandler( (t, e)->{
 			if(printErrorOnException){
-				e( "Logger", e.toString(), e );
+				e( "Logger", e.toString(), e, t );
 			}
 			flush();
 			if(previousHandler != null)
@@ -203,11 +203,19 @@ public class Logger {
 		}
 	}
 
-	public static void e(String tag, String message) {error( tag, message );}
+	public static void e(String tag, String message) {
+		error( tag, message, Thread.currentThread() );
+	}
 
-	public static void e(String tag, String message, Throwable tr) {error( tag, message + "\n" + Log.getStackTraceString( tr ) );}
+	public static void e(String tag, String message, Throwable tr){
+		e( tag, message, tr, Thread.currentThread() );
+	}
 
-	public static void error(String tag, String message) {
+	public static void e(String tag, String message, Throwable tr, Thread thread) {
+		error( tag, message + "\n" + Log.getStackTraceString( tr ), thread );
+	}
+
+	public static void error(String tag, String message, Thread thread) {
 		if ( isDebug ) {
 			Log.e( tag, message );
 		}
@@ -263,9 +271,13 @@ public class Logger {
 		}
 	}
 
-	private void addRecord(String level, String tag, String message) {
+	private void addRecord(String level, String tag, String message){
+		addRecord( level, tag, message, Thread.currentThread() );
+	}
+
+	private void addRecord(String level, String tag, String message, Thread thread) {
 		String time = new SimpleDateFormat( "yyyy-MM-dd HH:mm:ss.SSS" ).format( new Date() );
-		String out = level + ":" + time + " " + Process.myUid() + " " + Thread.currentThread().getId() + "/" + tag + ": " + message;
+		String out = level + ":" + time + " " + Process.myUid() + " " + thread.getId() + "/" + tag + ": " + message;
 		synchronized (mBuffer) {
 			mBuffer.add( out );
 			if ( mBuffer.size() >= BUFFER_SIZE ) {
