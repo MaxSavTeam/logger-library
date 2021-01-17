@@ -61,7 +61,7 @@ public class Logger {
 	 * @throws IOException This exception will be thrown if writer couldn't create file for current session
 	 */
 	public static void initialize(Context context, String rsaPublicKey, boolean debug) throws IOException {
-		initialize( context, rsaPublicKey, debug, 30, true );
+		initialize( context, rsaPublicKey, debug, 30, true, true );
 	}
 
 	/**
@@ -75,17 +75,20 @@ public class Logger {
 	 * @param timerPeriod  Logger will start a timer with a period in seconds that will flush the entries in the buffer.
 	 *                     Pass {@code timerPeriod} <= 0 if you don't want autoflushing.
 	 *                     Default is 30.
+	 * @param autoFlushOnException If true, Logger will override Thread.defaultUncaughtExceptionHandler.
+	 *                             Default is true.
+	 *                             <b>Note: </b> if {@code printErrorOnException} is true, this parameter automatically true.
 	 * @param printErrorOnException If true, then when an exception occurs, the Logger will record it automatically with tag "Logger" and throw the exception further.
 	 *                              Default is true.
 	 * @throws IOException This exception will be thrown if writer couldn't create file for current session
 	 */
-	public static void initialize(Context context, String rsaPublicKey, boolean debug, int timerPeriod, boolean printErrorOnException) throws IOException{
+	public static void initialize(Context context, String rsaPublicKey, boolean debug, int timerPeriod, boolean autoFlushOnException, boolean printErrorOnException) throws IOException{
 		isDebug = debug;
 		if ( verifyKey( rsaPublicKey ) ) {
 			mRsaPublicKey = rsaPublicKey;
 		}
 		initialized = true;
-		instance = new Logger( context, timerPeriod, printErrorOnException );
+		instance = new Logger( context, timerPeriod, autoFlushOnException, printErrorOnException );
 	}
 
 	private static boolean verifyKey(String stringKey) {
@@ -101,7 +104,7 @@ public class Logger {
 		}
 	}
 
-	private Logger(Context context, int timerPeriod, boolean printErrorOnException) throws IOException {
+	private Logger(Context context, int timerPeriod, boolean autoFlushOnException, boolean printErrorOnException) throws IOException {
 		mWriter = new Writer( context, mRsaPublicKey );
 		if(timerPeriod > 0){
 			mTimer = new Timer();
@@ -112,15 +115,17 @@ public class Logger {
 				}
 			}, timerPeriod * 1000, timerPeriod * 1000 );
 		}
-		final Thread.UncaughtExceptionHandler previousHandler = Thread.getDefaultUncaughtExceptionHandler();
-		Thread.setDefaultUncaughtExceptionHandler( (t, e)->{
-			if(printErrorOnException){
-				e( "Logger", e.toString(), e, t );
-			}
-			flush();
-			if(previousHandler != null)
-				previousHandler.uncaughtException( t, e );
-		} );
+		if(autoFlushOnException || printErrorOnException) {
+			final Thread.UncaughtExceptionHandler previousHandler = Thread.getDefaultUncaughtExceptionHandler();
+			Thread.setDefaultUncaughtExceptionHandler( (t, e)->{
+				if ( printErrorOnException ) {
+					e( "Logger", e.toString(), e, t );
+				}
+				flush();
+				if ( previousHandler != null )
+					previousHandler.uncaughtException( t, e );
+			} );
+		}
 	}
 
 	/**
