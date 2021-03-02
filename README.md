@@ -5,7 +5,7 @@ This library was developed to log all messages into a standard log and at the sa
 ## Integration
 ### Step 1
 Add JitPack dependency to your project-level build.gradle
-``` 
+``` groovy
 allprojects {
     repositories {
         maven { url 'https://jitpack.io' }
@@ -14,7 +14,7 @@ allprojects {
 ```
 ### Step 2
 Add library dependency to your module-level build.gradle
-```
+``` groovy
 dependencies {
     implementation 'com.github.MaxSavTeam:logger-library:0.5.0'
 }
