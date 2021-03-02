@@ -8,7 +8,6 @@ import android.util.Log;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.security.KeyFactory;
-import java.security.PublicKey;
 import java.security.spec.X509EncodedKeySpec;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
