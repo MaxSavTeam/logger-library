@@ -94,7 +94,7 @@ public class Logger {
 			return false;
 		X509EncodedKeySpec spec = new X509EncodedKeySpec( Base64.decode( stringKey, Base64.DEFAULT ) );
 		try {
-			PublicKey key = KeyFactory.getInstance( "RSA" ).generatePublic( spec );
+			KeyFactory.getInstance( "RSA" ).generatePublic( spec );
 			return true; // if no exceptions
 		} catch (Exception e) {
 			e.printStackTrace();

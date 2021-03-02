@@ -36,7 +36,7 @@ public class LogDecryptor {
 		}
 	}
 
-	static ArrayList<String> readFileLinesWithoutPartSeparator(String path) throws IOException {
+	public static ArrayList<String> readFileLinesWithoutPartSeparator(String path) throws IOException {
 		ArrayList<String> strings = new ArrayList<>();
 		BufferedReader reader = new BufferedReader( new FileReader( new File( path ) ) );
 		while(reader.ready()){

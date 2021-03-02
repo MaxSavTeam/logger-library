@@ -37,7 +37,7 @@ class Writer {
 	public static final String partsSeparatorString = "================";
 	public int additionalInfoLinesCount;
 
-	Writer(Context context, String rsaPublicKey) throws IOException {
+	public Writer(Context context, String rsaPublicKey) throws IOException {
 		this.rsaPublicKey = rsaPublicKey;
 		if(rsaPublicKey != null)
 			mEncryptor = new Encryptor( rsaPublicKey );
@@ -71,19 +71,19 @@ class Writer {
 		mThread.start();
 	}
 
-	String getPath() {
+	public String getPath() {
 		return path;
 	}
 
-	int getAdditionalInfoLinesCount() {
+	public int getAdditionalInfoLinesCount() {
 		return additionalInfoLinesCount;
 	}
 
-	void addAll(ArrayList<String> arrayList){
+	public void addAll(ArrayList<String> arrayList){
 		mQueue.addAll( arrayList );
 	}
 
-	void close(){
+	public void close(){
 		mThread.interrupt();
 		needToClose = true;
 	}

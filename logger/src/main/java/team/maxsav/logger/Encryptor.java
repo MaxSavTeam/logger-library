@@ -16,7 +16,7 @@ class Encryptor {
 	private Cipher mCipher;
 	private int blockSize;
 
-	Encryptor(String key) {
+	public Encryptor(String key) {
 		X509EncodedKeySpec spec = new X509EncodedKeySpec( Base64.decode( key, Base64.DEFAULT ) );
 		try {
 			Key publicKey = KeyFactory.getInstance( "RSA" ).generatePublic( spec );
@@ -38,7 +38,7 @@ class Encryptor {
 		return out;
 	}
 
-	String encrypt(String text) throws GeneralSecurityException {
+	public String encrypt(String text) throws GeneralSecurityException {
 		if(text.length() <= blockSize){
 			return encryptPart( text );
 		}else{
