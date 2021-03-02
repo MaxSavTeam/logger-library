@@ -4,7 +4,7 @@ This library was developed to log all messages into a standard log and at the sa
 
 ## Integration
 ### Step 1
-Add Jitpack dependency to your project-level build.gradle
+Add JitPack dependency to your project-level build.gradle
 ``` 
 allprojects {
     repositories {
@@ -22,7 +22,7 @@ dependencies {
 ```
 
 ## Usage
-### Initilization
+### Initialization
 Firstly, you need to initialize Logger
 ```
 Logger.initialize(Context context, String rsaPublicKey, boolean isDebug, int timerPeriod, boolean autoFlushOnException, boolean printErrorOnException);
