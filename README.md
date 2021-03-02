@@ -23,7 +23,7 @@ dependencies {
 ## Usage
 ### Initialization
 Firstly, you need to initialize Logger
-```
+``` java
 Logger.initialize(Context context, String rsaPublicKey, boolean isDebug, int timerPeriod, boolean autoFlushOnException, boolean printErrorOnException);
 ```
 `Context context` is application context. Context is used to get application external file  
@@ -57,5 +57,5 @@ Also you can use short commands ``Logger.i``, ``Logger.w``, ``Logger.v``, ``Logg
 
 In each command should be passed tag like first argument and message like second argument  
 
-Messgaes in log look like  
+Messages in log look like  
 Level name first character + : + time + process id + thread id + / + tag + : + message
