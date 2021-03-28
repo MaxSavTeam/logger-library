@@ -5,6 +5,8 @@ import android.os.Process;
 import android.util.Base64;
 import android.util.Log;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.security.KeyFactory;
@@ -28,6 +30,66 @@ public class Logger {
 	private final Writer mWriter;
 	private Timer mTimer;
 
+	public static class Initializer{
+		private final Context mContext;
+		private String rsaPublicKey = DEFAULT_PUBLIC_KEY;
+		private boolean isDebug = false;
+		private int timerPeriod = 20;
+		private boolean autoFlushOnException = true;
+		private boolean printErrorOnException = true;
+
+		public Initializer(@NotNull Context context) {
+			mContext = context.getApplicationContext();
+		}
+
+		/**
+		 * Sets RSA key to encrypt log messages (pass null to disable).
+		 * Default is {@link Logger#DEFAULT_PUBLIC_KEY}
+		 * */
+		public Initializer setRsaPublicKey(String rsaPublicKey) {
+			this.rsaPublicKey = rsaPublicKey;
+			return this;
+		}
+
+		/**
+		 * Sets flag to send logs to default Android log
+		 * */
+		public Initializer setDebug(boolean debug) {
+			isDebug = debug;
+			return this;
+		}
+
+		/**
+		 * Sets the timer period (in seconds) after which all messages from the buffer are automatically written to the file.
+		 * Pass 0 to disable timer.
+		 * Default is 20
+		 * */
+		public Initializer setTimerPeriod(int timerPeriod) {
+			this.timerPeriod = timerPeriod;
+			return this;
+		}
+
+		/**
+		 * Sets flag to flush on uncaught exception.
+		 * If you want to use auto flush and your own uncaught exception handler, please initialize Logger AFTER you set your own handler,
+		 * because logger overrides exception handler, while retaining the previous one
+		 * */
+		public Initializer setAutoFlushOnException(boolean autoFlushOnException) {
+			this.autoFlushOnException = autoFlushOnException;
+			return this;
+		}
+
+		/**
+		 * Sets flag to print uncaught exception to log file.
+		 * If you want to use auto flush and your own uncaught exception handler, please initialize Logger AFTER you set your own handler,
+		 * because logger overrides exception handler, while retaining the previous one
+		 * */
+		public Initializer setPrintErrorOnException(boolean printErrorOnException) {
+			this.printErrorOnException = printErrorOnException;
+			return this;
+		}
+	}
+
 	/**
 	 * RSA public key.
 	 * You can use it to protect log from users, but it can be decrypted by anyone who saw this file,
@@ -48,6 +110,22 @@ public class Logger {
 	}
 
 	/**
+	 * Initializes Logger with default parameters
+	 * */
+	public static void initialize(@NotNull Context context) throws IOException {
+		initialize( new Initializer( context ) );
+	}
+
+	public static void initialize(@NotNull Initializer initializer) throws IOException {
+		isDebug = initializer.isDebug;
+		if ( verifyKey( initializer.rsaPublicKey ) ) {
+			mRsaPublicKey = initializer.rsaPublicKey;
+		}
+		initialized = true;
+		instance = new Logger( initializer.mContext, initializer.timerPeriod, initializer.autoFlushOnException, initializer.printErrorOnException );
+	}
+
+	/**
 	 * Initializes logger. Should be called before usage
 	 *
 	 * @param context      application context
@@ -58,7 +136,7 @@ public class Logger {
 	 * @throws IOException This exception will be thrown if writer couldn't create file for current session
 	 */
 	public static void initialize(Context context, String rsaPublicKey, boolean debug) throws IOException {
-		initialize( context, rsaPublicKey, debug, 30, true, true );
+		initialize( new Initializer( context ).setRsaPublicKey( rsaPublicKey ).setDebug( debug ) );
 	}
 
 	/**
@@ -79,13 +157,15 @@ public class Logger {
 	 *                              Default is true.
 	 * @throws IOException This exception will be thrown if writer couldn't create file for current session
 	 */
+	@Deprecated
 	public static void initialize(Context context, String rsaPublicKey, boolean debug, int timerPeriod, boolean autoFlushOnException, boolean printErrorOnException) throws IOException{
-		isDebug = debug;
-		if ( verifyKey( rsaPublicKey ) ) {
-			mRsaPublicKey = rsaPublicKey;
-		}
-		initialized = true;
-		instance = new Logger( context, timerPeriod, autoFlushOnException, printErrorOnException );
+		Initializer initializer = new Initializer( context );
+		initializer.setDebug( debug )
+				.setRsaPublicKey( rsaPublicKey )
+				.setAutoFlushOnException( autoFlushOnException )
+				.setPrintErrorOnException( printErrorOnException )
+				.setTimerPeriod( timerPeriod );
+		initialize( initializer );
 	}
 
 	private static boolean verifyKey(String stringKey) {
