@@ -1,6 +1,6 @@
 # Logger
 
-[![Codacy Badge](https://app.codacy.com/project/badge/Grade/649c136f4b9f42c39b243e5835a3659b)](https://www.codacy.com/gh/MaxSavTeam/logger-library/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=MaxSavTeam/logger-library&amp;utm_campaign=Badge_Grade)
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/232b57274f444d22b61441247cd82a18)](https://www.codacy.com/gh/MaxSavTeam/logger-library/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=MaxSavTeam/logger-library&amp;utm_campaign=Badge_Grade)
 
 This library was developed to log all messages into a standard log and at the same time write them to a separate file for each session.
 
