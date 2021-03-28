@@ -156,6 +156,7 @@ public class Logger {
 	 * @param printErrorOnException If true, then when an exception occurs, the Logger will record it automatically with tag "Logger" and throw the exception further.
 	 *                              Default is true.
 	 * @throws IOException This exception will be thrown if writer couldn't create file for current session
+	 * @deprecated Use constructor with {@link Initializer}, because it is more customizable and flexible
 	 */
 	@Deprecated
 	public static void initialize(Context context, String rsaPublicKey, boolean debug, int timerPeriod, boolean autoFlushOnException, boolean printErrorOnException) throws IOException{
